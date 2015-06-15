@@ -59,13 +59,26 @@ GLuint CreateSimpleTexture2D( )
    // Texture object handle
    GLuint textureId;
 
-   // 2x2 Image, 3 bytes per pixel (R, G, B)
-   GLubyte pixels[4 * 3] =
+   // 4x4 Image, 3 bytes per pixel (R, G, B)
+   GLubyte pixels[16 * 3] =
    {
       255,   0,   0, // Red
         0, 255,   0, // Green
         0,   0, 255, // Blue
-      255, 255,   0  // Yellow
+      255, 255,   0,  // Yellow
+       255,   255,   0, // Yellow
+       0,  0, 255,      // Blue
+       0,   255, 0, // Green
+       255, 0,   0,  // Red
+       255,   0,   0, // Red
+       0, 255,   0, // Green
+       0,   0, 255, // Blue
+       255, 255,   0,  // Yellow
+       255,   255,   0, // Yellow
+       0, 0,   255, // Blue
+       0,   255, 0, // Green
+       255, 0,   0  // Red
+       
    };
 
    // Use tightly packed data
@@ -77,8 +90,24 @@ GLuint CreateSimpleTexture2D( )
    // Bind the texture object
    glBindTexture ( GL_TEXTURE_2D, textureId );
 
+#if 1
+    // texture stride test
+    // by Zhenwei, 2015.06.15;
+    glPixelStorei(GL_UNPACK_ROW_LENGTH, 4);
+    glPixelStorei(GL_UNPACK_SKIP_PIXELS, 2);
+    glPixelStorei(GL_UNPACK_SKIP_ROWS, 1);
+    
+    // GLubyte *start = pixels + (1 + 1 * 4) * 3;
    // Load the texture
-   glTexImage2D ( GL_TEXTURE_2D, 0, GL_RGB, 2, 2, 0, GL_RGB, GL_UNSIGNED_BYTE, pixels );
+   glTexImage2D ( GL_TEXTURE_2D, 0, GL_RGB, 2, 3, 0, GL_RGB, GL_UNSIGNED_BYTE, pixels );
+    
+    glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+    glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0);
+    glPixelStorei(GL_UNPACK_SKIP_ROWS, 0);
+#else
+    // Load the texture
+    glTexImage2D ( GL_TEXTURE_2D, 0, GL_RGB, 4, 4, 0, GL_RGB, GL_UNSIGNED_BYTE, pixels );
+#endif
 
    // Set the filtering mode
    glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
